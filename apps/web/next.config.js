@@ -1,3 +1,4 @@
+require("dotenv").config({ path: "../../.env.local" });
 require("dotenv").config({ path: "../../.env" });
 const englishTranslation = require("./public/static/locales/en/common.json");
 const { withAxiom } = require("next-axiom");
