@@ -33,7 +33,7 @@ sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE doctorcita TO doctorc
 
 ```bash
 # Clonar el repositorio
-git clone [tu-fork-url] /var/www/doctorcita
+git clone https://github.com/Soft-GroupRD/doctorcita.git /var/www/doctorcita
 cd /var/www/doctorcita
 
 # Instalar dependencias
