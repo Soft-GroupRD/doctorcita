@@ -37,6 +37,7 @@ import { LargeCalendar } from "./components/LargeCalendar";
 import { OverlayCalendar } from "./components/OverlayCalendar/OverlayCalendar";
 import { RedirectToInstantMeetingModal } from "./components/RedirectToInstantMeetingModal";
 import { BookerSection } from "./components/Section";
+import { SeniorBooker } from "./components/SeniorBooker";
 import { NotFound } from "./components/Unavailable";
 import { useIsQuickAvailabilityCheckFeatureEnabled } from "./components/hooks/useIsQuickAvailabilityCheckFeatureEnabled";
 import { fadeInLeft, getBookerSizeClassNames, useBookerResizeAnimation } from "./config";
@@ -326,6 +327,52 @@ const BookerComponent = ({
 
   if (bookerState === "loading") {
     return null;
+  }
+
+  // Doctorcita: senior-friendly booking layout (mobile-first, high contrast, large
+  // touch targets). Enabled by default; disabled for E2E, embeds, the platform
+  // atom and instant meetings. Set NEXT_PUBLIC_SENIOR_BOOKER="0" to opt out.
+  const seniorBookerEnabled =
+    process.env.NEXT_PUBLIC_SENIOR_BOOKER !== "0" &&
+    !process.env.NEXT_PUBLIC_IS_E2E &&
+    !isPlatform &&
+    !isEmbed &&
+    !isInstantMeeting;
+
+  if (seniorBookerEnabled) {
+    return (
+      <>
+        {event.data ? <BookingPageTagManager eventType={event.data} /> : <></>}
+        {(isBookingDryRunProp || isBookingDryRun(searchParams)) && <DryRunMessage isEmbed={isEmbed} />}
+        <SeniorBooker
+          event={event}
+          schedule={schedule}
+          isLoading={schedule.isPending}
+          bookerState={bookerState}
+          skipConfirmStep={skipConfirmStep}
+          onTimeSelect={onAvailableTimeSlotSelect}
+          onSubmit={onSubmit}
+          bookEventForm={EventBooker}
+        />
+        {verifyCode && formEmail ? (
+          <VerifyCodeDialog
+            isOpenDialog={isEmailVerificationModalVisible}
+            setIsOpenDialog={setEmailVerificationModalVisible}
+            email={formEmail}
+            isUserSessionRequiredToVerify={false}
+            verifyCodeWithSessionNotRequired={verifyCode.verifyCodeWithSessionNotRequired}
+            verifyCodeWithSessionRequired={verifyCode.verifyCodeWithSessionRequired}
+            error={verifyCode.error}
+            resetErrors={verifyCode.resetErrors}
+            isPending={verifyCode.isPending}
+            setIsPending={verifyCode.setIsPending}
+          />
+        ) : (
+          <></>
+        )}
+        <Toaster position="bottom-right" />
+      </>
+    );
   }
 
   return (
